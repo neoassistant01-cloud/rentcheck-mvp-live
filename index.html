@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>RentCheck - Property Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0d1117;
+      --bg-secondary: #161b22;
+      --bg-tertiary: #21262d;
+      --bg-card: #1c2128;
+      --teal: #2dd4bf;
+      --teal-dim: #0d9488;
+      --teal-glow: rgba(45, 212, 191, 0.15);
+      --text-primary: #f0f6fc;
+      --text-secondary: #8b949e;
+      --text-muted: #6e7681;
+      --success: #3fb950;
+      --warning: #d29922;
+      --danger: #f85149;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 20px;
+      padding-bottom: 100px;
+    }
+
+    /* Header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--teal);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--text-primary); }
+
+    .add-btn {
+      background: var(--teal);
+      color: var(--bg-primary);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 24px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .add-btn:hover { transform: scale(1.05); box-shadow: 0 0 20px var(--teal-glow); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--bg-secondary);
+      padding: 4px;
+      border-radius: var(--radius);
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--bg-tertiary);
+      color: var(--teal);
+    }
+
+    /* Property Card */
+    .property-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid var(--bg-tertiary);
+      transition: border-color 0.2s;
+    }
+
+    .property-card:active { border-color: var(--teal); }
+
+    .property-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .property-name {
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .property-address {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .menu-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 18px;
+      padding: 4px;
+      cursor: pointer;
+    }
+
+    /* Unit */
+    .unit {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      margin-top: 12px;
+    }
+
+    .unit-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .unit-number {
+      font-weight: 600;
+      font-size: 15px;
+    }
+
+    .rent-status {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .rent-status.paid {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--success);
+    }
+
+    .rent-status.unpaid {
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--warning);
+    }
+
+    .rent-status.overdue {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--danger);
+    }
+
+    .tenant-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .tenant-name {
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .tenant-phone {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .unit-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .action-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .action-btn.message {
+      background: var(--teal-glow);
+      color: var(--teal);
+    }
+
+    .action-btn.rent {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .action-btn.maintenance {
+      background: rgba(210, 153, 34, 0.1);
+      color: var(--warning);
+    }
+
+    .action-btn:active { transform: scale(0.97); }
+
+    /* Maintenance Issues */
+    .maintenance-list {
+      margin-top: 12px;
+    }
+
+    .maintenance-item {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-sm);
+      padding: 12px;
+      margin-bottom: 8px;
+      border-left: 3px solid var(--warning);
+    }
+
+    .maintenance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .maintenance-title {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .maintenance-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+
+    .maintenance-status.open {
+      background: rgba(210, 153, 34, 0.15);
+      color: var(--warning);
+    }
+
+    .maintenance-status.resolved {
+      background: rgba(63, 185, 80, 0.15);
+      color: var(--success);
+    }
+
+    .maintenance-date {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      z-index: 100;
+    }
+
+    .modal-overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border-radius: var(--radius) var(--radius) 0 0;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      transform: translateY(100%);
+      transition: transform 0.3s;
+    }
+
+    .modal-overlay.show .modal {
+      transform: translateY(0);
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 12px;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--bg-tertiary);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 15px;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--teal);
+    }
+
+    .form-textarea {
+      resize: none;
+      height: 80px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--teal);
+      color: var(--bg-primary);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .btn-danger {
+      background: rgba(248, 81, 73, 0.15);
+      color: var(--danger);
+    }
+
+    .btn:active { transform: scale(0.98); }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 8px;
+    }
+
+    .empty-desc {
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: var(--bg-card);
+      color: var(--text-primary);
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid var(--teal);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 200;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* Bottom Nav */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--bg-tertiary);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0;
+      padding-bottom: max(12px, env(safe-area-inset-bottom));
+    }
+
+    .nav-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .nav-btn.active { color: var(--teal); }
+
+    .nav-btn svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 3px; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">Rent<span>Check</span></div>
+      <button class="add-btn" onclick="showAddModal()">+</button>
+    </header>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('properties')">Properties</button>
+      <button class="tab" onclick="switchTab('maintenance')">Maintenance</button>
+    </div>
+
+    <div id="properties-view">
+      <div id="properties-list"></div>
+    </div>
+
+    <div id="maintenance-view" class="hidden">
+      <div id="maintenance-list"></div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <button class="nav-btn active" onclick="switchTab('properties')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span>Properties</span>
+    </button>
+    <button class="nav-btn" onclick="switchTab('maintenance')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+      <span>Issues</span>
+    </button>
+  </nav>
+
+  <!-- Add Property Modal -->
+  <div class="modal-overlay" id="add-property-modal">
+    <div class="modal">
+      <h3 class="modal-title">Add Property</h3>
+      <div class="form-group">
+        <label class="form-label">Property Name</label>
+        <input type="text" class="form-input" id="property-name" placeholder="e.g., Oak Street duplex">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Address</label>
+        <input type="text" class="form-input" id="property-address" placeholder="123 Oak St, City, State">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Unit Number</label>
+        <input type="text" class="form-input" id="unit-number" placeholder="e.g., 1A">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tenant Name</label>
+        <input type="text" class="form-input" id="tenant-name" placeholder="Tenant name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tenant Phone</label>
+        <input type="tel" class="form-input" id="tenant-phone" placeholder="(555) 123-4567">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Rent ($)</label>
+        <input type="number" class="form-input" id="monthly-rent" placeholder="1200">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('add-property-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="addProperty()">Add Property</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Maintenance Modal -->
+  <div class="modal-overlay" id="add-maintenance-modal">
+    <div class="modal">
+      <h3 class="modal-title">Log Maintenance Issue</h3>
+      <div class="form-group">
+        <label class="form-label">Select Unit</label>
+        <select class="form-select" id="maintenance-unit"></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Issue Title</label>
+        <input type="text" class="form-input" id="maintenance-title" placeholder="e.g., Leaky faucet">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="maintenance-desc" placeholder="Describe the issue..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('add-maintenance-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="addMaintenance()">Log Issue</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Update Rent Modal -->
+  <div class="modal-overlay" id="update-rent-modal">
+    <div class="modal">
+      <h3 class="modal-title">Update Rent Status</h3>
+      <div class="form-group">
+        <label class="form-label">Status</label>
+        <select class="form-select" id="rent-status">
+          <option value="paid">Paid</option>
+          <option value="unpaid">Unpaid</option>
+          <option value="overdue">Overdue</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Notes (optional)</label>
+        <textarea class="form-textarea" id="rent-notes" placeholder="Payment notes..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" onclick="closeModal('update-rent-modal')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveRentStatus()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Property Modal -->
+  <div class="modal-overlay" id="edit-property-modal">
+    <div class="modal">
+      <h3 class="modal-title">Edit Property</h3>
+      <div class="form-group">
+        <label class="form-label">Tenant Name</label>
+        <input type="text" class="form-input" id="edit-tenant-name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tenant Phone</label>
+        <input type="tel" class="form-input" id="edit-tenant-phone">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Monthly Rent ($)</label>
+        <input type="number" class="form-input" id="edit-monthly-rent">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="deleteProperty()">Delete</button>
+        <button class="btn btn-primary" onclick="saveProperty()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // State
+    let data = { properties: [], maintenance: [] };
+    let currentPropertyId = null;
+    let currentUnitId = null;
+
+    // Load from LocalStorage
+    function loadData() {
+      const saved = localStorage.getItem('rentcheck_data');
+      if (saved) {
+        data = JSON.parse(saved);
+      } else {
+        // Sample data for demo
+        data = {
+          properties: [
+            {
+              id: 1,
+              name: 'Oak Street Duplex',
+              address: '456 Oak St, Minneapolis, MN',
+              units: [
+                {
+                  id: 1,
+                  number: 'Unit 1A',
+                  tenant: { name: 'Sarah Johnson', phone: '(612) 555-0123' },
+                  rent: 1400,
+                  status: 'paid',
+                  lastPaid: '2026-04-01'
+                }
+              ]
+            },
+            {
+              id: 2,
+              name: 'Maple Ave Condo',
+              address: '789 Maple Ave, St Paul, MN',
+              units: [
+                {
+                  id: 2,
+                  number: 'Unit 201',
+                  tenant: { name: 'Mike Chen', phone: '(651) 555-0456' },
+                  rent: 1200,
+                  status: 'unpaid',
+                  lastPaid: '2026-03-01'
+                },
+                {
+                  id: 3,
+                  number: 'Unit 202',
+                  tenant: { name: 'Emily Davis', phone: '(651) 555-0789' },
+                  rent: 1250,
+                  status: 'paid',
+                  lastPaid: '2026-04-02'
+                }
+              ]
+            }
+          ],
+          maintenance: [
+            {
+              id: 1,
+              unitId: 2,
+              title: 'Dishwasher not draining',
+              description: 'Water pools at bottom after cycle.',
+              status: 'open',
+              date: '2026-04-03'
+            }
+          ]
+        };
+        saveData();
+      }
+    }
+
+    function saveData() {
+      localStorage.setItem('rentcheck_data', JSON.stringify(data));
+    }
+
+    // Render Properties
+    function renderProperties() {
+      const list = document.getElementById('properties-list');
+      
+      if (data.properties.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🏠</div>
+            <div class="empty-title">No properties yet</div>
+            <div class="empty-desc">Tap + to add your first property</div>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = data.properties.map(prop => `
+        <div class="property-card">
+          <div class="property-header">
+            <div>
+              <div class="property-name">${prop.name}</div>
+              <div class="property-address">${prop.address}</div>
+            </div>
+            <button class="menu-btn" onclick="editProperty(${prop.id})">⋮</button>
+          </div>
+          ${prop.units.map(unit => `
+            <div class="unit">
+              <div class="unit-header">
+                <span class="unit-number">${unit.number}</span>
+                <span class="rent-status ${unit.status}">${unit.status}</span>
+              </div>
+              <div class="tenant-info">
+                <div>
+                  <div class="tenant-name">${unit.tenant.name}</div>
+                  <div class="tenant-phone">${unit.tenant.phone}</div>
+                </div>
+              </div>
+              <div class="unit-actions">
+                <button class="action-btn message" onclick="messageTenant('${unit.tenant.phone}')">
+                  💬 Message
+                </button>
+                <button class="action-btn rent" onclick="updateRent(${unit.id})">
+                  💵 Rent
+                </button>
+                <button class="action-btn maintenance" onclick="openMaintenanceForUnit(${unit.id})">
+                  🔧
+                </button>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `).join('');
+    }
+
+    // Render Maintenance
+    function renderMaintenance() {
+      const list = document.getElementById('maintenance-list');
+      
+      if (data.maintenance.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">🔧</div>
+            <div class="empty-title">No maintenance issues</div>
+            <div class="empty-desc">All properties are running smoothly</div>
+          </div>
+        `;
+        return;
+      }
+
+      const getUnitInfo = (unitId) => {
+        for (const prop of data.properties) {
+          const unit = prop.units.find(u => u.id === unitId);
+          if (unit) return { unit, prop };
+        }
+        return null;
+      };
+
+      list.innerHTML = data.maintenance.map(issue => {
+        const info = getUnitInfo(issue.unitId);
+        if (!info) return '';
+        return `
+          <div class="maintenance-item">
+            <div class="maintenance-header">
+              <span class="maintenance-title">${issue.title}</span>
+              <span class="maintenance-status ${issue.status}">${issue.status}</span>
+            </div>
+            <div style="font-size: 13px; color: var(--text-secondary); margin: 4px 0;">${info.prop.name} - ${info.unit.number}</div>
+            <div style="font-size: 13px; margin: 6px 0;">${issue.description}</div>
+            <div class="maintenance-date">${issue.date}</div>
+            <div class="unit-actions" style="margin-top: 10px;">
+              ${issue.status === 'open' ? 
+                `<button class="btn btn-primary" style="flex:1; padding:8px;" onclick="resolveMaintenance(${issue.id})">Mark Resolved</button>` :
+                `<button class="btn btn-secondary" style="flex:1; padding:8px;" onclick="reopenMaintenance(${issue.id})">Reopen</button>`
+              }
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Tab Switching
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(n => n.classList.remove('active'));
+      
+      if (tab === 'properties') {
+        document.querySelectorAll('.tab')[0].classList.add('active');
+        document.querySelectorAll('.nav-btn')[0].classList.add('active');
+        document.getElementById('properties-view').classList.remove('hidden');
+        document.getElementById('maintenance-view').classList.add('hidden');
+      } else {
+        document.querySelectorAll('.tab')[1].classList.add('active');
+        document.querySelectorAll('.nav-btn')[1].classList.add('active');
+        document.getElementById('properties-view').classList.add('hidden');
+        document.getElementById('maintenance-view').classList.remove('hidden');
+        renderMaintenance();
+      }
+    }
+
+    // Modal Functions
+    function showAddModal() {
+      document.getElementById('add-property-modal').classList.add('show');
+    }
+
+    function openMaintenanceModal() {
+      const select = document.getElementById('maintenance-unit');
+      select.innerHTML = '';
+      data.properties.forEach(prop => {
+        prop.units.forEach(unit => {
+          select.innerHTML += `<option value="${unit.id}">${prop.name} - ${unit.number}</option>`;
+        });
+      });
+      document.getElementById('maintenance-title').value = '';
+      document.getElementById('maintenance-desc').value = '';
+      document.getElementById('add-maintenance-modal').classList.add('show');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('show');
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Add Property
+    function addProperty() {
+      const name = document.getElementById('property-name').value.trim();
+      const address = document.getElementById('property-address').value.trim();
+      const unitNumber = document.getElementById('unit-number').value.trim();
+      const tenantName = document.getElementById('tenant-name').value.trim();
+      const tenantPhone = document.getElementById('tenant-phone').value.trim();
+      const rent = parseInt(document.getElementById('monthly-rent').value) || 0;
+
+      if (!name || !unitNumber) {
+        showToast('Please fill in required fields');
+        return;
+      }
+
+      const property = {
+        id: Date.now(),
+        name,
+        address,
+        units: [{
+          id: Date.now(),
+          number: unitNumber,
+          tenant: { name: tenantName || 'No tenant', phone: tenantPhone || '' },
+          rent,
+          status: 'unpaid',
+          lastPaid: null
+        }]
+      };
+
+      data.properties.push(property);
+      saveData();
+      renderProperties();
+      closeModal('add-property-modal');
+      
+      // Clear form
+      document.getElementById('property-name').value = '';
+      document.getElementById('property-address').value = '';
+      document.getElementById('unit-number').value = '';
+      document.getElementById('tenant-name').value = '';
+      document.getElementById('tenant-phone').value = '';
+      document.getElementById('monthly-rent').value = '';
+      
+      showToast('Property added!');
+    }
+
+    // Edit Property
+    function editProperty(propId) {
+      const prop = data.properties.find(p => p.id === propId);
+      if (!prop || !prop.units[0]) return;
+      
+      currentPropertyId = propId;
+      const unit = prop.units[0];
+      
+      document.getElementById('edit-tenant-name').value = unit.tenant.name;
+      document.getElementById('edit-tenant-phone').value = unit.tenant.phone;
+      document.getElementById('edit-monthly-rent').value = unit.rent || '';
+      
+      document.getElementById('edit-property-modal').classList.add('show');
+    }
+
+    function saveProperty() {
+      const prop = data.properties.find(p => p.id === currentPropertyId);
+      if (prop && prop.units[0]) {
+        prop.units[0].tenant.name = document.getElementById('edit-tenant-name').value;
+        prop.units[0].tenant.phone = document.getElementById('edit-tenant-phone').value;
+        prop.units[0].rent = parseInt(document.getElementById('edit-monthly-rent').value) || 0;
+        saveData();
+        renderProperties();
+        closeModal('edit-property-modal');
+        showToast('Property updated!');
+      }
+    }
+
+    function deleteProperty() {
+      if (confirm('Delete this property?')) {
+        data.properties = data.properties.filter(p => p.id !== currentPropertyId);
+        saveData();
+        renderProperties();
+        closeModal('edit-property-modal');
+        showToast('Property deleted');
+      }
+    }
+
+    // Rent Status
+    function updateRent(unitId) {
+      currentUnitId = unitId;
+      let currentStatus = 'unpaid';
+      
+      for (const prop of data.properties) {
+        const unit = prop.units.find(u => u.id === unitId);
+        if (unit) {
+          currentStatus = unit.status;
+          break;
+        }
+      }
+      
+      document.getElementById('rent-status').value = currentStatus;
+      document.getElementById('rent-status').onchange = null;
+      document.getElementById('update-rent-modal').classList.add('show');
+    }
+
+    function saveRentStatus() {
+      const status = document.getElementById('rent-status').value;
+      
+      for (const prop of data.properties) {
+        const unit = prop.units.find(u => u.id === currentUnitId);
+        if (unit) {
+          unit.status = status;
+          if (status === 'paid') {
+            unit.lastPaid = new Date().toISOString().split('T')[0];
+          }
+          break;
+        }
+      }
+      
+      saveData();
+      renderProperties();
+      closeModal('update-rent-modal');
+      showToast('Rent status updated!');
+    }
+
+    // Message Tenant
+    function messageTenant(phone) {
+      if (!phone) {
+        showToast('No phone number');
+        return;
+      }
+      window.open(`sms:${phone}`, '_blank');
+    }
+
+    // Maintenance
+    function openMaintenanceForUnit(unitId) {
+      currentUnitId = unitId;
+      openMaintenanceModal();
+    }
+
+    function addMaintenance() {
+      const unitId = parseInt(document.getElementById('maintenance-unit').value);
+      const title = document.getElementById('maintenance-title').value.trim();
+      const desc = document.getElementById('maintenance-desc').value.trim();
+      
+      if (!title) {
+        showToast('Please enter an issue title');
+        return;
+      }
+      
+      const issue = {
+        id: Date.now(),
+        unitId: currentUnitId || unitId,
+        title,
+        description: desc,
+        status: 'open',
+        date: new Date().toISOString().split('T')[0]
+      };
+      
+      data.maintenance.push(issue);
+      saveData();
+      closeModal('add-maintenance-modal');
+      showToast('Maintenance issue logged!');
+      
+      document.getElementById('maintenance-title').value = '';
+      document.getElementById('maintenance-desc').value = '';
+    }
+
+    function resolveMaintenance(issueId) {
+      const issue = data.maintenance.find(i => i.id === issueId);
+      if (issue) {
+        issue.status = 'resolved';
+        saveData();
+        renderMaintenance();
+        showToast('Issue marked as resolved');
+      }
+    }
+
+    function reopenMaintenance(issueId) {
+      const issue = data.maintenance.find(i => i.id === issueId);
+      if (issue) {
+        issue.status = 'open';
+        saveData();
+        renderMaintenance();
+        showToast('Issue reopened');
+      }
+    }
+
+    // Close modal on overlay click
+    document.querySelectorAll('.modal-overlay').forEach(overlay => {
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.classList.remove('show');
+        }
+      });
+    });
+
+    // Initialize
+    loadData();
+    renderProperties();
+  </script>
+</body>
+</html>
